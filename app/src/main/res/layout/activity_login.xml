@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Password"
+        android:text="Test@123"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="@+id/edtUsername"
         app:layout_constraintStart_toStartOf="@+id/edtUsername"

@@ -2,18 +2,21 @@ package com.allianzcloud.chatfirebasedemo;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.allianzcloud.chatfirebasedemo.Model.MessagesVo;
+import com.allianzcloud.chatfirebasedemo.Util.Constant;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -43,8 +46,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
 
         LinearLayout llSender, llReceiver;
         TextView txtSender, txtReceiver;
-        ImageView imgSender, imgReceiver;
-        VideoView vidSender;
+        ImageView imgSender, imgReceiver , imgSP , imgRP;
 
         MyViewHolder(View view) {
             super(view);
@@ -55,7 +57,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
             txtReceiver = view.findViewById(R.id.txtReceiver);
             imgSender = view.findViewById(R.id.imgSender);
             imgReceiver = view.findViewById(R.id.imgReceiver);
-            vidSender = view.findViewById(R.id.vidSender);
+            imgRP = view.findViewById(R.id.imgRP);
+            imgSP = view.findViewById(R.id.imgSP);
+
         }
     }
 
@@ -68,54 +72,107 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
             holder.llSender.setVisibility(View.VISIBLE);
             holder.llReceiver.setVisibility(View.GONE);
 
-            if (data.getType().equalsIgnoreCase("text")) {
+            if (data.getType().equalsIgnoreCase(Constant.typeText)) {
                 holder.txtSender.setVisibility(View.VISIBLE);
                 holder.imgSender.setVisibility(View.GONE);
-                holder.vidSender.setVisibility(View.GONE);
+                holder.imgSP.setVisibility(View.GONE);
 
                 holder.txtSender.setText(data.getMsg());
-            } else if (data.getType().equalsIgnoreCase("image")){
+            } else if (data.getType().equalsIgnoreCase(Constant.typeImage)) {
                 holder.txtSender.setVisibility(View.GONE);
                 holder.imgSender.setVisibility(View.VISIBLE);
-                holder.vidSender.setVisibility(View.GONE);
+                holder.imgSender.setAlpha(1f);
+                holder.imgSP.setVisibility(View.GONE);
 
                 Picasso.get()
                         .load(data.getFile())
                         .resize(300, 300)
                         .centerCrop()
                         .into(holder.imgSender);
+            } else if (data.getType().equalsIgnoreCase(Constant.typeVideo)) {
+                holder.txtSender.setVisibility(View.GONE);
+                holder.imgSender.setVisibility(View.VISIBLE);
+                holder.imgSender.setAlpha(0.5f);
+                holder.imgSP.setVisibility(View.VISIBLE);
+
+                byte[] decodedByte = Base64.decode(data.getThumb(), 0);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+
+                holder.imgSender.setImageBitmap(bitmap);
             } else {
                 holder.txtSender.setVisibility(View.GONE);
                 holder.imgSender.setVisibility(View.GONE);
-                holder.vidSender.setVisibility(View.VISIBLE);
-
-                holder.vidSender.setVideoPath(data.getFile());
-                holder.vidSender.start();
+                holder.imgSender.setAlpha(1f);
+                holder.imgSP.setVisibility(View.VISIBLE);
             }
         } else {
             holder.llSender.setVisibility(View.GONE);
             holder.llReceiver.setVisibility(View.VISIBLE);
 
-            if (data.getType().equalsIgnoreCase("text")) {
+            if (data.getType().equalsIgnoreCase(Constant.typeText)) {
                 holder.txtReceiver.setVisibility(View.VISIBLE);
                 holder.imgReceiver.setVisibility(View.GONE);
+                holder.imgRP.setVisibility(View.GONE);
 
                 holder.txtReceiver.setText(data.getMsg());
-            } else {
+            } else if (data.getType().equalsIgnoreCase(Constant.typeImage)) {
                 holder.txtReceiver.setVisibility(View.GONE);
                 holder.imgReceiver.setVisibility(View.VISIBLE);
+                holder.imgReceiver.setAlpha(1f);
+                holder.imgRP.setVisibility(View.GONE);
+
+                Picasso.get()
+                        .load(data.getFile())
+                        .resize(300, 300)
+                        .centerCrop()
+                        .into(holder.imgReceiver);
+
+            } else if (data.getType().equalsIgnoreCase(Constant.typeVideo)) {
+                holder.txtReceiver.setVisibility(View.GONE);
+                holder.imgReceiver.setVisibility(View.VISIBLE);
+                holder.imgReceiver.setAlpha(0.5f);
+                holder.imgRP.setVisibility(View.VISIBLE);
+
+                byte[] decodedByte = Base64.decode(data.getThumb(), 0);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+
+                holder.imgReceiver.setImageBitmap(bitmap);
+            } else {
+                holder.txtReceiver.setVisibility(View.GONE);
+                holder.imgReceiver.setVisibility(View.GONE);
+                holder.imgReceiver.setAlpha(1f);
+                holder.imgRP.setVisibility(View.VISIBLE);
             }
         }
+
+        holder.imgSP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (data.getType().equalsIgnoreCase(Constant.typeAudio)){
+                    clickListener.onAudioClick(data);
+                } else {
+                    clickListener.onVideoClick(data);
+                }
+
+            }
+        });
+        holder.imgRP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clickListener.onVideoClick(data);
+            }
+        });
     }
 
     private static ClickListener clickListener;
 
-    public void setOnItemClickListener(ClickListener clickListener) {
+    void setOnItemClickListener(ClickListener clickListener) {
         ChatAdapter.clickListener = clickListener;
     }
 
     public interface ClickListener {
-        void onItemClick(MessagesVo data);
+        void onVideoClick(MessagesVo data);
+        void onAudioClick(MessagesVo data);
     }
 
     @Override

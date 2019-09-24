@@ -11,6 +11,9 @@ public class MessagesVo {
     @SerializedName("file")
     @Expose
     public String file;
+    @SerializedName("thumb")
+    @Expose
+    public String thumb;
     @SerializedName("receiver")
     @Expose
     public String receiver;
@@ -20,6 +23,9 @@ public class MessagesVo {
     @SerializedName("type")
     @Expose
     public String type;
+    @SerializedName("timeStamp")
+    @Expose
+    public double timeStamp;
 
     public String getMsg() {
         return msg;
@@ -35,6 +41,14 @@ public class MessagesVo {
 
     public void setFile(String file) {
         this.file = file;
+    }
+
+    public String getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
     }
 
     public String getReceiver() {
@@ -59,5 +73,13 @@ public class MessagesVo {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public double getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(double timeStamp) {
+        this.timeStamp = timeStamp;
     }
 }
